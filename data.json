@@ -1,0 +1,6 @@
+{
+    "max_it" : 1000,
+    "tol_res" : 1e-8,
+    "forceFunction" : "8 * pi * pi * sin(2 * pi * x) * sin(2 * pi * y)",
+    "gridDimension" : 5
+}
