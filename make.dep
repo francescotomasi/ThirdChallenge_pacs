@@ -1,4 +1,29 @@
-main.o: main.cpp \
+main.o: main.cpp include/mpi_utils.hpp include/grid_utils.hpp \
+ include/config.hpp include/algorithms.hpp include/muparser_fun.hpp \
+ /home/frenci/pacs-examples/Examples/include/muParser.h \
+ /home/frenci/pacs-examples/Examples/include/muParserBase.h \
+ /home/frenci/pacs-examples/Examples/include/muParserDef.h \
+ /home/frenci/pacs-examples/Examples/include/muParserFixes.h \
+ /home/frenci/pacs-examples/Examples/include/muParserTokenReader.h \
+ /home/frenci/pacs-examples/Examples/include/muParserToken.h \
+ /home/frenci/pacs-examples/Examples/include/muParserError.h \
+ /home/frenci/pacs-examples/Examples/include/muParserCallback.h \
+ /home/frenci/pacs-examples/Examples/include/muParserBytecode.h \
+ /home/frenci/pacs-examples/Examples/include/muParserTemplateMagic.h
+mpi_utils.o: src/mpi_utils.cpp include/mpi_utils.hpp \
+ include/muparser_fun.hpp \
+ /home/frenci/pacs-examples/Examples/include/muParser.h \
+ /home/frenci/pacs-examples/Examples/include/muParserBase.h \
+ /home/frenci/pacs-examples/Examples/include/muParserDef.h \
+ /home/frenci/pacs-examples/Examples/include/muParserFixes.h \
+ /home/frenci/pacs-examples/Examples/include/muParserTokenReader.h \
+ /home/frenci/pacs-examples/Examples/include/muParserToken.h \
+ /home/frenci/pacs-examples/Examples/include/muParserError.h \
+ /home/frenci/pacs-examples/Examples/include/muParserCallback.h \
+ /home/frenci/pacs-examples/Examples/include/muParserBytecode.h \
+ /home/frenci/pacs-examples/Examples/include/muParserTemplateMagic.h
+grid_utils.o: src/grid_utils.cpp include/grid_utils.hpp
+config.o: src/config.cpp include/config.hpp \
  /home/frenci/pacs-examples/Examples/include/nlohmann/json.hpp \
  /home/frenci/pacs-examples/Examples/include/nlohmann/adl_serializer.hpp \
  /home/frenci/pacs-examples/Examples/include/nlohmann/detail/abi_macros.hpp \
@@ -43,14 +68,6 @@ main.o: main.cpp \
  /home/frenci/pacs-examples/Examples/include/nlohmann/detail/conversions/to_chars.hpp \
  /home/frenci/pacs-examples/Examples/include/nlohmann/ordered_map.hpp \
  /home/frenci/pacs-examples/Examples/include/nlohmann/detail/macro_unscope.hpp \
- /home/frenci/pacs-examples/Examples/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
- muparser_fun.hpp /home/frenci/pacs-examples/Examples/include/muParser.h \
- /home/frenci/pacs-examples/Examples/include/muParserBase.h \
- /home/frenci/pacs-examples/Examples/include/muParserDef.h \
- /home/frenci/pacs-examples/Examples/include/muParserFixes.h \
- /home/frenci/pacs-examples/Examples/include/muParserTokenReader.h \
- /home/frenci/pacs-examples/Examples/include/muParserToken.h \
- /home/frenci/pacs-examples/Examples/include/muParserError.h \
- /home/frenci/pacs-examples/Examples/include/muParserCallback.h \
- /home/frenci/pacs-examples/Examples/include/muParserBytecode.h \
- /home/frenci/pacs-examples/Examples/include/muParserTemplateMagic.h
+ /home/frenci/pacs-examples/Examples/include/nlohmann/thirdparty/hedley/hedley_undef.hpp
+algorithms.o: src/algorithms.cpp include/algorithms.hpp \
+ include/grid_utils.hpp
