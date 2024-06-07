@@ -1,72 +1,109 @@
-#include "mpi_utils.hpp"
-#include "grid_utils.hpp"
-#include "config.hpp"
-#include "algorithms.hpp"
-#include "muparser_fun.hpp"
-#include <vector>
-#include <string>
-#include <iostream>
 #include <mpi.h>
+#include <omp.h>
+#include <vector>
+#include <nlohmann/json.hpp>
+#include "muparser_fun.hpp"
+#include <fstream>
+#include "algorithms.hpp"
 
-int main(int argc, char** argv) {
-    int rank, size, provided;
+using json = nlohmann::json;
+
+void print_grids( const std::vector<double>& grid, int row, int col) {
+    std::cout << "\nGrid:\n";
+    for ( int i = 0; i < row; ++i) {
+        for ( int j = 0; j < col; ++j) {
+            std::cout << grid[i * col + j] << " ";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n";
+}
+
+void write_vtks(const std::string& filename, const std::vector<double>& grid, int row, int col) {
+    std::ofstream file;
+    file.open(filename);
+
+    file << "# vtk DataFile Version 3.0\n";
+    file << "Grid data\n";
+    file << "ASCII\n";
+    file << "DATASET RECTILINEAR_GRID\n";
+    file << "DIMENSIONS " << col << " " << row << " 1\n";
+    
+    file << "X_COORDINATES " << col << " float\n";
+    for (int i = 0; i < col; ++i) {
+        file << i << " ";
+    }
+    file << "\n";
+    
+    file << "Y_COORDINATES " << row << " float\n";
+    for (int i = 0; i < row; ++i) {
+        file << i << " ";
+    }
+    file << "\n";
+    
+    file << "Z_COORDINATES 1 float\n";
+    file << "0\n";
+    
+    file << "POINT_DATA " << row * col << "\n";
+    file << "SCALARS solution float 1\n";
+    file << "LOOKUP_TABLE default\n";
+    for (int i = 0; i < row; ++i) {
+        for (int j = 0; j < col; ++j) {
+            file << grid[i * col + j] << " ";
+        }
+        file << "\n";
+    }
+    
+    file.close();
+}
+
+int main(int argc, char** argv){
+
+    int provided;
     MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+    
+    int rank,size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     int max_it;
     double tol_res;
     std::string forceFunction;
-    int gridDim;
+    int gridDim ;
 
     if (rank == 0) {
-        read_config("data.json", max_it, tol_res, forceFunction, gridDim);
+        std::ifstream z("data.json");
+        json j = json::parse(z);
+        
+        max_it = j.value("max_it", 1000);
+        tol_res = j.value("tol_res", 1e-7);
+        forceFunction = j.value("forceFunction"," ");
+        gridDim  = j.value("gridDimension", 10);
     }
 
-    broadcast_parameters(rank, max_it, tol_res, forceFunction, gridDim);
+    MPI_Bcast(&max_it, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&tol_res, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&gridDim, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&forceFunction, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
 
-    double h = 1.0 / (gridDim - 1);
-    MuparserFun fun(forceFunction, 2);
-
-    int local_nrows;
-    std::vector<double> f_local;
-    std::vector<int> counts, displs;
-    distribute_grid(rank, size, gridDim, fun, h, f_local, local_nrows, counts, displs);
-
-    if (rank == 0) {
-        std::cout << "Force function da rank 0:\n";
-        print_grid(f_local, local_nrows, gridDim);
-    }
-
-    std::vector<double> U_local(gridDim * (local_nrows + 2), 0.0);
-    std::vector<double> U_local_new(gridDim * (local_nrows + 2), 0.0);
-
-    // Choose algorithm
-    bool use_parallel = true;  // Set this based on your requirements
-
-    if (use_parallel) {
-        run_parallel_algorithm(rank, size, gridDim, local_nrows, max_it, tol_res, 
-                               f_local, U_local, U_local_new, counts, displs);
-    } else {
-        run_sequential_algorithm(gridDim, max_it, tol_res, f_local, U_local, U_local_new);
-    }
-
+    std::vector<double> f_tot( gridDim * (gridDim) , 0.0);
+    int local_nrows = (gridDim % size > rank) ? gridDim/size +1 : gridDim/size;
+    std::vector<double> f_local( gridDim * local_nrows , 0.0);
+    std::vector<int> counts(size-1, 0);
+    std::vector<int> displs(size-1, 0);
+    std::vector<double> U_real_local( gridDim * (local_nrows)  , 0.0);
+    std::vector<double> U_real_tot( gridDim * (gridDim) , 0.0);
+    
+    jacobi_parallel( gridDim, forceFunction, f_tot, f_local, counts, displs, U_real_local, U_real_tot, max_it, tol_res );
     MPI_Barrier(MPI_COMM_WORLD);
-    if (rank == 1) {
-        std::cout << "\nU_local da rank 1 dopo l'algoritmo:\n";
-        print_grid(U_local, local_nrows + 2, gridDim);
-    }
-
-    std::vector<double> U_real_local(gridDim * local_nrows, 0.0);
-    std::vector<double> U_real_tot(gridDim * gridDim, 0.0);
-
-    gather_results(rank, size, gridDim, local_nrows, U_local, U_real_local, U_real_tot, counts, displs);
-
-    if (rank == 0) {
-        std::cout << "\nU_real_tot dopo l'algoritmo:\n";
-        print_grid(U_real_tot, gridDim, gridDim);
+    if(rank == 0){
+        //std::cout << "\nU_real_tot dopo iterazioni:\n";
+        //print_grids(U_real_tot, gridDim, gridDim);
+        write_vtks("solution.vtk", U_real_tot, gridDim, gridDim);
     }
 
     MPI_Finalize();
+
+
     return 0;
 }

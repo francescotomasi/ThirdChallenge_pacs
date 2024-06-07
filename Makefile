@@ -12,7 +12,7 @@ DEPEND = make.dep
 
 EXEC = main
 # Include the source files in src and the main.cpp
-SRCS = main.cpp src/mpi_utils.cpp src/grid_utils.cpp src/config.cpp src/algorithms.cpp
+SRCS = main.cpp src/algorithms.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 .PHONY: all $(EXEC) $(OBJS) clean distclean $(DEPEND)
