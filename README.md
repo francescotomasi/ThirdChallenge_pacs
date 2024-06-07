@@ -1,6 +1,3 @@
-Sure! Here's the improved README in English for your project "Third Challenge Pacs":
-
----
 
 # Third Challenge Pacs
 
@@ -46,11 +43,6 @@ For the algorithm, two new vectors `T_local` and `U_local_new` are created to st
 1. Execute the Jacobi algorithm.
 2. Save the local results in `U_real_local` with the correct dimensions.
 3. Gather `U_real_local` into `U_real_tot`, representing the final function.
-
-## Implemented Algorithms
-
-- Non-parallel Jacobi algorithm.
-- Parallel Jacobi algorithm.
 
 ## Requirements
 
