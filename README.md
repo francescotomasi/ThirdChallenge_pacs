@@ -12,6 +12,16 @@ change directory in ThirdChallenge_pacs
 make
 ```
 
+If you have problem like:
+```sh
+./main: error while loading shared libraries: libmuparser.so.2: cannot open shared object file: No such file or directory
+```
+
+write in your current directory something like that (with your path)
+```sh
+LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/frenci/pacs-examples/Examples/lib 
+```
+
 ### Esecution
 
 ```sh

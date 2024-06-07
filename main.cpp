@@ -97,7 +97,7 @@ int main(int argc, char** argv){
     jacobi_parallel( gridDim, forceFunction, f_tot, f_local, counts, displs, U_real_local, U_real_tot, max_it, tol_res );
     MPI_Barrier(MPI_COMM_WORLD);
     if(rank == 0){
-        //std::cout << "\nU_real_tot dopo iterazioni:\n";
+        std::cout << "\nU_real_tot dopo iterazioni:\n";
         //print_grids(U_real_tot, gridDim, gridDim);
         write_vtks("solution.vtk", U_real_tot, gridDim, gridDim);
     }
