@@ -1,0 +1,3 @@
+The code was crashing. I tried to fix the bug but I was then unable to make the code produce a result it terminates with U_real_tot dopo iterazioni: without writing anything. I have not time to look deeper in the problem.
+
+A solution is produced that looks fine, but no convergence no scalability tests are present

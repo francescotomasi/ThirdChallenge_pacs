@@ -89,8 +89,9 @@ int main(int argc, char** argv){
     std::vector<double> f_tot( gridDim * (gridDim) , 0.0);
     int local_nrows = (gridDim % size > rank) ? gridDim/size +1 : gridDim/size;
     std::vector<double> f_local( gridDim * local_nrows , 0.0);
-    std::vector<int> counts(size-1, 0);
-    std::vector<int> displs(size-1, 0);
+    //@note ERROR in counts. COunts and displs should be of size size 
+    std::vector<int> counts(size, 0);
+    std::vector<int> displs(size, 0);
     std::vector<double> U_real_local( gridDim * (local_nrows)  , 0.0);
     std::vector<double> U_real_tot( gridDim * (gridDim) , 0.0);
     
