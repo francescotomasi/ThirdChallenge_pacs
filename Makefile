@@ -1,9 +1,9 @@
 # Insert the path to the folder with muparser and json libraries
-PACS_ROOT = /home/frenci/pacs-examples/Examples
+PACS_ROOT ?= /home/frenci/pacs-examples/Examples
 
 CXX       = mpic++
 CXXFLAGS ?= -std=c++20
-CPPFLAGS ?= -fopenmp -O3 -Wall -pedantic -Iinclude -I${PACS_ROOT}/include
+CPPFLAGS ?= -fopenmp -g -Wall -pedantic -Iinclude -I${PACS_ROOT}/include
 
 LDFLAGS ?= -L${PACS_ROOT}/lib
 LIBS    ?= -lmuparser
